@@ -1,0 +1,66 @@
+$tabsHeight: 36px;
+$tabColor: #e4d4bd;
+$tabSelectedColor: #f0e7da;
+
+.folder-tab {
+  height: $tabsHeight;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background-color: $tabColor;
+  left: 28px;
+  z-index: 2;
+  margin-right: 50px;
+  color: #734201;
+  cursor: pointer;
+
+  transition: color 0.2s, background-color 0.2s;
+
+  &.selected,
+  &:hover {
+    z-index: 3;
+    color: #4c2d04;
+    background-color: $tabSelectedColor;
+    &:before,
+    &:after {
+      background-color: $tabSelectedColor;
+    }
+  }
+
+  &:before {
+    // opacity:1;
+    height: $tabsHeight;
+    width: 30px;
+    border-radius: 10px 10px 0px 0px;
+    background-color: $tabColor;
+    content: "";
+    position: absolute;
+    left: -20px;
+    top: 0px;
+    -webkit-transform: skewX(-20deg);
+    transform: skewX(-20deg);
+    z-index: -1;
+  }
+  &:after {
+    height: $tabsHeight;
+    width: 30px;
+    border-radius: 10px 10px 0px 0px;
+    background-color: $tabColor;
+    content: "";
+    position: absolute;
+    right: -20px;
+    top: 0px;
+    -webkit-transform: skewX(20deg);
+    transform: skewX(20deg);
+    z-index: -1;
+  }
+  span {
+    display: inline-block;
+    margin-left: 8px;
+    margin-right: 8px;
+    height: $tabsHeight;
+    line-height: $tabsHeight + 4;
+    z-index: 3;
+  }
+}
