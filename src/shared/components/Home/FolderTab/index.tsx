@@ -1,4 +1,4 @@
-import { HomeTabs } from "@shared/pages";
+import { HomeTabs } from "@shared/pages/app";
 import { PropsWithChildren } from "react";
 
 interface FolderTablProps {
@@ -17,9 +17,7 @@ export const FolderTab: React.FC<PropsWithChildren<FolderTablProps>> = ({
   return (
     <div
       className={`folder-tab ${isCurrentSelectedTab ? "selected" : ""}`}
-      onClick={() =>
-        onTabClick && onTabClick(isCurrentSelectedTab ? undefined : tabName)
-      }
+      onClick={() => onTabClick && onTabClick(isCurrentSelectedTab ? undefined : tabName)}
     >
       {children}
     </div>

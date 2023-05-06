@@ -1,4 +1,4 @@
-import { HomeTabs } from "@shared/pages";
+import { HomeTabs } from "@shared/pages/app";
 import { ReactNode } from "react";
 import { HistoricoTab } from "./HistoricoTab";
 import { PagamentosTab } from "./PagamentosTab";
