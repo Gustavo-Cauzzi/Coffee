@@ -4,6 +4,9 @@ import { CoffeeCard } from "@shared/components/Card";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string } from "yup";
+import { getApi } from "@shared/services/api";
+import { toast } from "react-hot-toast";
+import { useRouter } from "next/router";
 
 interface FormValues {
   username: string;
@@ -17,7 +20,7 @@ const schema = object().shape({
   username: string().required("Informação obrigatória").max(20),
   name: string().required("Informação obrigatória").max(60),
   password: string().required("Informação obrigatória").max(200).min(4, "Senha deve ter pelo menos 4 caracteres"),
-  passwordConfirmation: string()
+  confirmPassword: string()
     .required("Informação obrigatória")
     .test({
       test: function (value) {
@@ -27,13 +30,15 @@ const schema = object().shape({
     }),
 });
 
-export default function signIn() {
+export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const {
     control,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<FormValues>({
     defaultValues: {
       username: "",
@@ -45,8 +50,27 @@ export default function signIn() {
     resolver: yupResolver(schema),
   });
 
+  const password = watch("password");
+  const confirmPassword = watch("confirmPassword");
+
   console.log("errors: ", errors);
-  const handleSubmitUser = async (data: FormValues) => {};
+  const handleSubmitUser = async ({ confirmPassword, ...data }: FormValues) => {
+    setIsLoading(true);
+    type Response = { message?: string };
+    const response = await getApi().post<Response>("/users", data);
+    console.log("response.status: ", response.status);
+    if (response.status === 270) {
+      toast.error(response.data.message ?? "");
+      return;
+    } else {
+      toast.success("Usuário criado");
+      router.push("/login");
+    }
+    console.log("response.data: ", response.data);
+    setIsLoading(false);
+  };
+
+  const passwordMismatch = password && confirmPassword && password !== confirmPassword;
 
   return (
     <main className="fixed inset-0 flex">
@@ -61,6 +85,13 @@ export default function signIn() {
 
           <Controller
             control={control}
+            name="name"
+            render={({ field }) => (
+              <TextField label="Nome" {...field} error={!!errors.name} helperText={errors.name?.message ?? ""} />
+            )}
+          />
+          <Controller
+            control={control}
             name="username"
             render={({ field }) => (
               <TextField
@@ -71,16 +102,32 @@ export default function signIn() {
               />
             )}
           />
+
+          {/* <hr className="my-2 max-w-[250px] bg-gray-400 w-full h-[2px]" /> */}
+
           <Controller
             control={control}
             name="password"
             render={({ field }) => (
               <TextField
-                error={!!errors.username}
-                helperText={errors.username?.message ?? ""}
+                error={!!errors.password}
+                helperText={errors.password?.message ?? ""}
                 label="Senha"
                 type="password"
                 {...field}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <TextField
+                label="Confirmar a senha"
+                type="password"
+                {...field}
+                error={!!errors.confirmPassword || !!passwordMismatch}
+                helperText={errors.confirmPassword?.message ?? ((passwordMismatch && "Senhas não coincidem") || "")}
               />
             )}
           />

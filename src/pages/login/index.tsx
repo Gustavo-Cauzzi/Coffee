@@ -60,7 +60,7 @@ export default function Login() {
 
       <form
         onSubmit={handleSubmit(handleSubmitLogin)}
-        className="absolute left-0 top-0 bottom-0 pl-10 flex justify-center items-center"
+        className="absolute left-0 top-0 bottom-0 pl-20 flex justify-center items-center"
       >
         <CoffeeCard className="flex flex-col justify-center items-center gap-6 min-w-[20rem] text-black">
           <h1 className="text-3xl text-coffee-light-800 mb-5">Login</h1>

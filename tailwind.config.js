@@ -23,6 +23,9 @@ module.exports = {
                     950: "#3A2C18",
                 },
             },
+            fontFamily: {
+                coffee: "var(--pacifico-font)",
+            },
         },
     },
     plugins: [],

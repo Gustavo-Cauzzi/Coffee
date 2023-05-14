@@ -21,7 +21,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 Get(Match(Index("user_by_username_and_password"), username, hashedPassowrd))
             );
 
-            const parsedUser = { id: user.ref.id, username: user.data.username } as User;
+            const { password: _password, ...userInfo } = user.data;
+
+            const parsedUser = { id: user.ref.id, ...userInfo } as User;
 
             const jwt = sign(parsedUser, SUPER_HIPER_MEGA_SECRET);
             console.log("jwt: ", jwt);
