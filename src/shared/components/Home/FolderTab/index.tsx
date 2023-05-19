@@ -1,4 +1,4 @@
-import { HomeTabs } from "@shared/pages/app";
+import { HomeTabs } from "../../../../pages/coffee";
 import { PropsWithChildren } from "react";
 
 interface FolderTablProps {

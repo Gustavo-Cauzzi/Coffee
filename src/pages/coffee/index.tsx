@@ -7,11 +7,13 @@ import {
   DialogTitle,
   IconButton,
   Popover,
+  Tooltip,
 } from "@mui/material";
 import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
 import { User } from "@shared/@types/User";
 import { FolderTab } from "@shared/components/Home/FolderTab";
 import { folderContent } from "@shared/components/Home/Tabs";
+import { useFolderActions } from "@shared/context/FolderActionContext";
 import { getApi } from "@shared/services/api";
 import { logOut } from "@shared/store/modules/authSlice";
 import { AppDispatch, RootState } from "@shared/store/store";
@@ -20,12 +22,13 @@ import { ReactNode, SyntheticEvent, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { AiOutlineClose } from "react-icons/ai";
 import { BsArrowsAngleContract, BsArrowsAngleExpand } from "react-icons/bs";
-import { FiPower, FiShield, FiTrash2, FiUser } from "react-icons/fi";
+import { FiInfo, FiPower, FiShield, FiTrash2, FiUser } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 
 const possibleBackgrounds = ["/background1.png", "/background2.png", "/background3.png"];
 
 const BACKGROUND_CHANGE_DELAY = 30 * 1000; // 30 segs
+const FOLDER_HEIGHT_MINIFIED = 300;
 
 export type HomeTabs = "histórico" | "pagamentos";
 
@@ -33,6 +36,7 @@ const getBackgroundImageBasedOnTime = () =>
   possibleBackgrounds[Math.floor((Date.now() / BACKGROUND_CHANGE_DELAY) % possibleBackgrounds.length)];
 
 export default function Home() {
+  const { actionButton } = useFolderActions();
   const [backgroundImg, setBackgroundImg] = useState(getBackgroundImageBasedOnTime);
   const [openTab, setOpenTab] = useState<HomeTabs>();
   const [expandedTab, setExpandedTab] = useState(false);
@@ -137,18 +141,22 @@ export default function Home() {
             id="folder-content"
             className="bg-coffee-light-200 mt-[-1px] z-[100] rounded-t-3xl px-4"
             style={{
-              marginBottom: openTab ? 0 : -200,
-              height: expandedTab ? window.innerHeight - 50 : 200,
+              marginBottom: openTab ? 0 : -FOLDER_HEIGHT_MINIFIED,
+              height: expandedTab ? window.innerHeight - 50 : FOLDER_HEIGHT_MINIFIED,
               transition: "margin 0.2s, height 0.2s",
             }}
           >
-            <div className="p-5 w-full flex justify-end text-black">
-              <IconButton size="small" onClick={handleExpand}>
-                {expandedTab ? <BsArrowsAngleContract size={16} /> : <BsArrowsAngleExpand size={16} />}
-              </IconButton>
-              <IconButton size="small" onClick={() => setOpenTab(undefined)}>
-                <AiOutlineClose size={16} />
-              </IconButton>
+            <div className="p-5 w-full flex justify-between text-black">
+              {(openTab && actionButton[openTab]) || <div />}
+
+              <div className="flex">
+                <IconButton size="small" onClick={handleExpand}>
+                  {expandedTab ? <BsArrowsAngleContract size={16} /> : <BsArrowsAngleExpand size={16} />}
+                </IconButton>
+                <IconButton size="small" onClick={() => setOpenTab(undefined)}>
+                  <AiOutlineClose size={16} />
+                </IconButton>
+              </div>
             </div>
 
             {(openTab && folderContent[openTab]) ?? <></>}
@@ -311,7 +319,18 @@ const AdminDialog: React.FC<{ open: boolean; onClose: () => any }> = ({ onClose,
 
   return (
     <Dialog open={open} maxWidth="sm" fullWidth onClose={onClose}>
-      <DialogTitle>Administração</DialogTitle>
+      <DialogTitle>
+        <div className="flex gap-2 items-center">
+          Administração
+          <Tooltip arrow title="Tela acessível apenas para usuários administradores como você" placement="top">
+            <div>
+              <IconButton color="primary">
+                <FiInfo />
+              </IconButton>
+            </div>
+          </Tooltip>
+        </div>
+      </DialogTitle>
       <DialogContent>
         <div className="flex flex-col max-w-[90vh]">
           <div className="flex justify-end">

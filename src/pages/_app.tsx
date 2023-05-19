@@ -9,6 +9,7 @@ import { Provider, useDispatch } from "react-redux";
 import { Toaster } from "react-hot-toast";
 import { loadUser } from "@shared/store/modules/authSlice";
 import { useEffect } from "react";
+import { FolderActionProvider } from "@shared/context/FolderActionContext";
 
 const pacifico = Pacifico({
   weight: "400",
@@ -20,12 +21,14 @@ export default function App({ Component, ...rest }: AppProps) {
   return (
     <div className={pacifico.className}>
       <ThemeProvider theme={coffeeTheme}>
-        <Toaster />
+        <FolderActionProvider>
+          <Toaster />
 
-        <Provider store={store}>
-          <LoadUser />
-          <Component {...pageProps} />
-        </Provider>
+          <Provider store={store}>
+            <LoadUser />
+            <Component {...pageProps} />
+          </Provider>
+        </FolderActionProvider>
       </ThemeProvider>
     </div>
   );
