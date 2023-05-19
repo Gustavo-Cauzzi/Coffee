@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { Button, CircularProgress, TextField } from "@mui/material";
 import { CoffeeCard } from "@shared/components/Card";
-import { getApi } from "@shared/services/api";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { object, string } from "yup";

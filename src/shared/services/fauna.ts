@@ -14,3 +14,7 @@ export interface FaunaResponse<T extends any> {
     };
     data: T;
 }
+
+export interface FaunaArrayResponse<T extends any> {
+    data: FaunaResponse<T>[];
+}
