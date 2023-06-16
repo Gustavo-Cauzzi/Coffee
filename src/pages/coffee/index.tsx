@@ -40,7 +40,7 @@ export default function Home() {
   const [openTab, setOpenTab] = useState<HomeTabs>();
   const [expandedTab, setExpandedTab] = useState(false);
 
-  const isManager = useSelector<RootState, boolean>((state) => state.auth.user?.isGerente ?? false);
+  const isManager = useSelector<RootState, boolean>((state) => state.auth.user?.isManager ?? false);
 
   useEffect(() => {
     const interval = setInterval(() => setBackgroundImg(getBackgroundImageBasedOnTime()), BACKGROUND_CHANGE_DELAY);
@@ -360,11 +360,11 @@ const AdminDialog: React.FC<{ open: boolean; onClose: () => any }> = ({ onClose,
                 ),
               },
               {
-                field: "isGerente",
+                field: "isManager",
                 headerName: "Gerente",
                 width: 100,
                 renderCell: (p: GridRenderCellParams<User, boolean | undefined>) => (
-                  <Checkbox checked={!!p.value} onChange={() => handleUpdate({ ...p.row, isGerente: !p.value })} />
+                  <Checkbox checked={!!p.value} onChange={() => handleUpdate({ ...p.row, isManager: !p.value })} />
                 ),
               },
             ]}

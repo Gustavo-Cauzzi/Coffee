@@ -29,14 +29,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
     } else if (req.method === "GET") {
         try {
-            const response = await fauna.query<FaunaArrayResponse<Charge>>(
+            const response: FaunaArrayResponse<Charge> = await fauna.query(
                 Map(
                     Paginate(Documents(Collection("charges"))),
                     Lambda((x) => Get(x))
                 )
             );
 
-            return res.status(200).json(response.data);
+            console.log("response.data: ", response.data);
+
+            return res.status(200).json(response.data.flatMap((d) => ({ ...d.data, id: d.ref.id })));
         } catch (e) {
             console.error(e);
             res.status(404).json({ message: "Não foi possível buscar as cobranças" });

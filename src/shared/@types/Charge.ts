@@ -5,4 +5,5 @@ export interface Charge {
     maxPaymentDate: Date | null;
     personsIds: number[];
     user: Pick<User, "id" | "name">;
+    id: string;
 }

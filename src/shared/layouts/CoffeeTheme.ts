@@ -43,6 +43,7 @@ export const coffeeTheme = createTheme({
                 disableColumnSelector: process.env.NODE_ENV === "production",
                 disableColumnFilter: process.env.NODE_ENV === "production",
                 autoHeight: true,
+                disableRowSelectionOnClick: true,
                 pageSizeOptions: [10, 20, 35, 50],
                 localeText: MUI_DATAGRID_PT_BR,
                 initialState: {
@@ -67,9 +68,8 @@ export const coffeeTheme = createTheme({
                         "& .MuiDataGrid-row": {
                             border: 0,
                             cursor: "pointer",
-                            transition: "background-color 0.2s",
                             "&:hover": {
-                                backgroundColor: "#E0E0E0",
+                                filter: "brightness(0.9)",
                             },
                         },
                         "& .MuiDataGrid-row:first-of-type": {
@@ -78,10 +78,8 @@ export const coffeeTheme = createTheme({
                             overflow: "hidden",
                         },
                         "& .MuiDataGrid-row:nth-of-type(odd)": {
-                            backgroundColor: `rgba(0, 0, 0, ${hoverOpacity})`,
-
                             "&:hover": {
-                                backgroundColor: "#E0E0E0",
+                                filter: "brightness(0.9)",
                             },
 
                             "&.Mui-selected": {

@@ -13,6 +13,7 @@ import { ptBR } from "date-fns/locale";
 import { useEffect } from "react";
 import { FolderActionProvider } from "@shared/context/FolderActionContext";
 import { LocalizationProvider } from "@mui/x-date-pickers";
+
 const pacifico = Pacifico({
   weight: "400",
   subsets: ["latin"],
