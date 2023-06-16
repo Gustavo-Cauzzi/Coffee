@@ -10,6 +10,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
+import { HomeTabs } from "@shared/@types/HomeTabs";
 import { User } from "@shared/@types/User";
 import { FolderTab } from "@shared/components/Home/FolderTab";
 import { folderContent } from "@shared/components/Home/Tabs";
@@ -30,8 +31,6 @@ const possibleBackgrounds = ["/background1.png", "/background2.png", "/backgroun
 const BACKGROUND_CHANGE_DELAY = 30 * 1000; // 30 segs
 const FOLDER_HEIGHT_MINIFIED = 300;
 
-export type HomeTabs = "histórico" | "pagamentos";
-
 const getBackgroundImageBasedOnTime = () =>
   possibleBackgrounds[Math.floor((Date.now() / BACKGROUND_CHANGE_DELAY) % possibleBackgrounds.length)];
 
@@ -40,6 +39,8 @@ export default function Home() {
   const [backgroundImg, setBackgroundImg] = useState(getBackgroundImageBasedOnTime);
   const [openTab, setOpenTab] = useState<HomeTabs>();
   const [expandedTab, setExpandedTab] = useState(false);
+
+  const isManager = useSelector<RootState, boolean>((state) => state.auth.user?.isGerente ?? false);
 
   useEffect(() => {
     const interval = setInterval(() => setBackgroundImg(getBackgroundImageBasedOnTime()), BACKGROUND_CHANGE_DELAY);
@@ -133,6 +134,11 @@ export default function Home() {
             <FolderTab selectedTab={openTab} tabName="histórico" onTabClick={handleOpenTab}>
               Histórico
             </FolderTab>
+            {isManager && (
+              <FolderTab selectedTab={openTab} tabName="cobrancas" onTabClick={handleOpenTab}>
+                Cobranças
+              </FolderTab>
+            )}
             <FolderTab selectedTab={openTab} tabName="pagamentos" onTabClick={handleOpenTab}>
               Pagamentos
             </FolderTab>
@@ -182,10 +188,8 @@ const UserMenu: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    console.log("busdaibduias");
     dispatch(logOut());
     router.push("/login");
-    console.log("busdaibduias2");
   };
 
   const id = "user-menu";
@@ -267,7 +271,6 @@ const AdminDialog: React.FC<{ open: boolean; onClose: () => any }> = ({ onClose,
       const response = await getApi()
         .get("/users")
         .finally(() => toast.dismiss(tid));
-      console.log("response.data: ", response.data);
       setUsers(response.data.users);
     };
 

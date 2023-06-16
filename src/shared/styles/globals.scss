@@ -3,7 +3,9 @@
 @tailwind utilities;
 
 .MuiButtonBase-root.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary {
-  @apply bg-coffee-light-800;
+  &:not(.Mui-disabled) {
+    @apply bg-coffee-light-800;
+  }
   &:hover {
     @apply bg-coffee-light-900;
   }
@@ -20,6 +22,17 @@
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
+  }
+}
+
+.nice-scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 3px;
   }
 }
 

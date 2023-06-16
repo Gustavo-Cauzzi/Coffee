@@ -9,6 +9,7 @@ import { AppDispatch, RootState } from "@shared/store/store";
 import { useDispatch, useSelector } from "react-redux";
 import { logIn } from "@shared/store/modules/authSlice";
 import { useRouter } from "next/router";
+import { toast } from "react-hot-toast";
 
 interface FormValues {
   username: string;
@@ -45,7 +46,10 @@ export default function Login() {
 
   const handleSubmitLogin = async (data: FormValues) => {
     setIsLoading(true);
-    await dispatch(logIn(data));
+    const result = await dispatch(logIn(data));
+    if (logIn.rejected.match(result)) {
+      toast.error("Usuário inexistente ou senha incorreta");
+    }
     setIsLoading(false);
   };
 

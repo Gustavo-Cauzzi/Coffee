@@ -12,7 +12,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { name, username, password } = req.body;
 
         const existentUsername = await findUserByUsername(username);
-        console.log("existentUsername: ", existentUsername);
         if (existentUsername) {
             res.status(270).json({ message: "Username já registrado" });
             return;

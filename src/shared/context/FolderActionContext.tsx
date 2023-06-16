@@ -1,6 +1,5 @@
-import { Dispatch, createContext, ReactNode, SetStateAction, useState, PropsWithChildren, useContext } from "react";
-import { HomeTabs } from "../../pages/coffee";
-
+import { HomeTabs } from "@shared/@types/HomeTabs";
+import { PropsWithChildren, ReactNode, createContext, useContext, useState } from "react";
 type ActionMap = Record<HomeTabs, ReactNode>;
 
 interface FolderActionContext {
