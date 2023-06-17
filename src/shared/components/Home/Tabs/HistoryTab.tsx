@@ -29,7 +29,7 @@ export const HistoryTab: FC = () => {
                 field: "created_at",
                 headerName: "Horário",
                 flex: 1,
-                valueGetter: (p) => p.row.created_at.toLocaleDateString('pt-BR'),
+                valueGetter: (p) => new Date(p.row.created_at).toLocaleTimeString('pt-BR') + ' ' + new Date(p.row.created_at).toLocaleDateString('pt-BR'),
               },
             ]}
             rows={histories}

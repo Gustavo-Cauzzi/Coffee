@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 Create(Collection("histories"), {
                     data: {
                         user,
-                        created_at: new Date()
+                        created_at: new Date().toISOString()
                     },
                 })
             );
