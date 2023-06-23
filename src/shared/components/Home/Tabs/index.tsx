@@ -1,11 +1,11 @@
 import { ReactNode } from "react";
-import { HistoricoTab } from "./HistoricoTab";
+import { HistoryTab } from "./HistoryTab";
 import { ChargeTab } from "./ChargeTab";
 import { PaymentTab } from "./PaymentTab";
 import { HomeTabs } from "../../../../pages/coffee";
 
 export const folderContent: Record<HomeTabs, ReactNode> = {
-  histórico: <HistoricoTab />,
+  histórico: <HistoryTab />,
   pagamentos: <PaymentTab />,
   cobrancas: <ChargeTab />,
 };

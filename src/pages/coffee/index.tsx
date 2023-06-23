@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
 import { User } from "@shared/@types/User";
+import { History } from "@shared/@types/History";
 import { FolderTab } from "@shared/components/Home/FolderTab";
 import { folderContent } from "@shared/components/Home/Tabs";
 import { useFolderActions } from "@shared/context/FolderActionContext";
@@ -40,6 +41,7 @@ export default function Home() {
   const [openTab, setOpenTab] = useState<HomeTabs>();
   const [expandedTab, setExpandedTab] = useState(false);
 
+  const user = useSelector<RootState, User | undefined>((state) => state.auth.user);
   const isManager = useSelector<RootState, boolean>((state) => state.auth.user?.isManager ?? false);
 
   useEffect(() => {
@@ -62,6 +64,25 @@ export default function Home() {
 
   const handleExpand = () => {
     setExpandedTab((state) => !state);
+  };
+
+  const handleNewCoffeeConfirmed = async () => {
+    if (!user) {
+      toast.error("Usuário atual não encontrado");
+      return;
+    }
+
+    const toastId = toast.loading("Passando café");
+    getApi()
+      .post("/histories", {
+        user: {
+          id: user.id,
+          name: user.name,
+        },
+      } as History)
+      .then(() => toast.success("Café passado com sucesso. Todos serão notificados!"))
+      .catch(() => toast.error("Não foi possível passar o café!"))
+      .finally(() => toast.dismiss(toastId));
   };
 
   const handleNewCoffee = () => {
@@ -88,10 +109,6 @@ export default function Home() {
       ),
       { style: { maxWidth: 700 } }
     );
-  };
-
-  const handleNewCoffeeConfirmed = () => {
-    console.log("duisbudasi");
   };
 
   return (
