@@ -8,7 +8,10 @@ export const getApi = () => {
     });
 
     api.interceptors.response.use(
-        (response) => response,
+        (response) => {
+            response.data = castDatesInObj(response.data);
+            return response;
+        },
         (error: AxiosError) => {
             if (error.response?.status === 280) {
                 toast.error((error.response.data as any | undefined)?.message ?? "Ocorreu um erro");
@@ -16,4 +19,32 @@ export const getApi = () => {
         }
     );
     return api;
+};
+
+const isObject = (value: any) => typeof value === "object" && value !== null && !Array.isArray(value);
+const castDatesInObj = (obj: unknown): unknown => {
+    if (obj === null) return obj;
+
+    if (obj instanceof Array) {
+        return obj.map((v) => (isObject(v) ? castDatesInObj(v) : v));
+    }
+
+    if (isObject(obj)) {
+        return Object.fromEntries(
+            Object.entries(obj as Record<string, unknown>).map(([key, value]) => {
+                if (value === null) {
+                    return [key, value];
+                }
+                if (
+                    typeof value === "string" &&
+                    value.match(/\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/g)
+                ) {
+                    return [key, new Date(value as string)];
+                }
+                return [key, castDatesInObj(value)];
+            })
+        );
+    }
+
+    return obj;
 };

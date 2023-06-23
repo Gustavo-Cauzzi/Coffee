@@ -37,6 +37,68 @@ export const coffeeTheme = createTheme({
                 },
             },
         },
+        MuiTableHead: {
+            styleOverrides: {
+                root: {
+                    "& .MuiTableCell-root": {
+                        fontWeight: "bold",
+                    },
+                },
+            },
+        },
+        MuiTableCell: {
+            styleOverrides: {
+                root: {
+                    padding: "0.25rem 1rem",
+                },
+            },
+        },
+        MuiTableRow: {
+            styleOverrides: {
+                root: {
+                    // '& .MuiTableCell-root:first-of-type': {
+                    //     borderLeft
+                    // }
+                    borderRadius: 10,
+                    transition: "background-color 0.15s",
+                },
+            },
+        },
+        MuiTableBody: {
+            styleOverrides: {
+                root: {
+                    // Não há uma forma simples provida pelo Material de detectar a presença de um collapse em uma tabela!
+                    // MuiTableRow-root com collapse devem ser coloridas uma a cada 4 linhas devido as linhas escondidas que o
+                    // Collapse gera. Para detectar, detectamos pelo CSS se há colunas com apenas uma célula com colSpan, que
+                    // é um bom (mas não perfeito) indicador da presença de um collapse naquela tabela.
+
+                    // Com collapse
+                    "&:has(> .MuiTableRow-root > .MuiTableCell-root[colspan]:only-child)": {
+                        ".MuiTableRow-root:not(.MuiTableRow-head)": {
+                            "&:nth-of-type(4n -1)": {
+                                backgroundColor: "rgba(0, 0, 0,0.04)",
+                            },
+                            // Hover de TableRow configurado aqui dentro para manter prioridade sobre o :nth-of-type acima
+                            "&:not(:has(.MuiCollapse-root)):hover": {
+                                backgroundColor: "rgba(0, 0, 0,0.1)",
+                            },
+                        },
+                    },
+                    // Sem collapse (mesma coisa porém negado)
+                    "&:not(:has(> .MuiTableRow-root > .MuiTableCell-root[colspan]:only-child))": {
+                        ".MuiTableRow-root:not(.MuiTableRow-head)": {
+                            "&:nth-of-type(2n -1)": {
+                                backgroundColor: "rgba(0, 0, 0,0.04)",
+                            },
+                            // Hover de TableRow configurado aqui dentro para manter prioridade sobre o :nth-of-type acima
+                            "&:not(:has(.MuiCollapse-root)):hover": {
+                                backgroundColor: "rgba(0, 0, 0,0.1)",
+                            },
+                        },
+                    },
+                },
+            },
+        },
         MuiDataGrid: {
             defaultProps: {
                 disableColumnMenu: process.env.NODE_ENV === "production",

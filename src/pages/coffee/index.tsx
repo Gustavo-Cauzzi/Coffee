@@ -10,7 +10,6 @@ import {
   Tooltip,
 } from "@mui/material";
 import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
-import { HomeTabs } from "@shared/@types/HomeTabs";
 import { User } from "@shared/@types/User";
 import { FolderTab } from "@shared/components/Home/FolderTab";
 import { folderContent } from "@shared/components/Home/Tabs";
@@ -27,6 +26,7 @@ import { FiInfo, FiPower, FiShield, FiTrash2, FiUser } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 
 const possibleBackgrounds = ["/background1.png", "/background2.png", "/background3.png"];
+export type HomeTabs = "histórico" | "cobrancas" | "pagamentos";
 
 const BACKGROUND_CHANGE_DELAY = 30 * 1000; // 30 segs
 const FOLDER_HEIGHT_MINIFIED = 300;

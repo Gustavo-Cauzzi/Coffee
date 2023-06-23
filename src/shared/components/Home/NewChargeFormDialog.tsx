@@ -43,7 +43,7 @@ const defaultValues = {
 export const NewChargeFormDialog = ({ onClose, ...props }: NewChargeFormDialogProps) => {
   const [users, setUsers] = useState<User[]>([]);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: 10 });
-  const [checkboxSelection, setCheckboxSelection] = useState<number[]>([]);
+  const [checkboxSelection, setCheckboxSelection] = useState<User["id"][]>([]);
 
   const user = useSelector<RootState, User | undefined>((state) => state.auth.user);
 
@@ -82,13 +82,14 @@ export const NewChargeFormDialog = ({ onClose, ...props }: NewChargeFormDialogPr
     getApi()
       .post("/charges", {
         maxPaymentDate: data.maxPaymentDate,
-        personsIds: checkboxSelection,
+        persons: checkboxSelection.map((id) => users.find((u) => u.id === id)),
         quantity: Number(data.quantity),
         user: {
           id: user.id,
           name: user.name,
         },
-      } as Charge)
+        date: new Date(),
+      })
       .then(() => toast.success("Cobrança criada. Pagadores serão notificados!") && handleClose())
       .catch(() => toast.error("Não foi possível salvar os dados"))
       .finally(() => toast.dismiss(toastId));
@@ -147,7 +148,7 @@ export const NewChargeFormDialog = ({ onClose, ...props }: NewChargeFormDialogPr
               columns={[{ field: "name", maxWidth: 500, flex: 1, headerName: "Nome" }]}
               rows={users}
               rowSelectionModel={checkboxSelection}
-              onRowSelectionModelChange={(newSelection) => setCheckboxSelection(newSelection as number[])}
+              onRowSelectionModelChange={(newSelection) => setCheckboxSelection(newSelection as User["id"][])}
               density="compact"
               className="mt-1"
               checkboxSelection
