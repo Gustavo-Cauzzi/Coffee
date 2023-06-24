@@ -32,7 +32,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             res.status(201).json({ message: "Usuário criado" });
         } catch (e) {
-            console.log(e);
             res.status(400).json({ message: "Não foi possível cadastrar o usuário" });
         }
     } else if (req.method === "GET") {
@@ -43,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             )
         );
         return res.status(200).json({ users: usersResponse.data.flatMap((d) => ({ ...d.data, id: d.ref.id })) });
-    } else if (req.method === "PATCH") {
+    } else if (req.method === "PUT") {
         const { id: ref, ...user } = req.body as User;
 
         try {
@@ -65,7 +64,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 const findUserByUsername = async (username: string) => {
     try {
         const response = await fauna.query<FaunaResponse<User>>(Get(Match(Index("user_by_username"), username)));
-        console.log("response findUserNByUsername: ", username, response);
         return response.data;
     } catch (e) {
         return null;

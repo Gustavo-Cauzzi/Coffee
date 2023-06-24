@@ -162,11 +162,13 @@ export default function Home() {
           </div>
           <div
             id="folder-content"
-            className="bg-coffee-light-200 mt-[-1px] z-[100] rounded-t-3xl px-4"
+            className="bg-coffee-light-200 mt-[-1px] z-[100] rounded-t-3xl px-4 nice-scrollbar"
+            data-folder-content
             style={{
               marginBottom: openTab ? 0 : -FOLDER_HEIGHT_MINIFIED,
               height: expandedTab ? window.innerHeight - 50 : FOLDER_HEIGHT_MINIFIED,
               transition: "margin 0.2s, height 0.2s",
+              overflow: "overlay",
             }}
           >
             <div className="p-5 w-full flex justify-between text-black">
@@ -205,8 +207,11 @@ const UserMenu: React.FC = () => {
   };
 
   const handleLogout = async () => {
+    setOpen(false);
+    const toastId = toast.loading("Saindo...");
     dispatch(logOut());
     router.push("/login");
+    toast.dismiss(toastId);
   };
 
   const id = "user-menu";
@@ -297,7 +302,7 @@ const AdminDialog: React.FC<{ open: boolean; onClose: () => any }> = ({ onClose,
   const handleUpdate = async (user: User) => {
     const tid = toast.loading("Alterando...");
     await getApi()
-      .patch("/users", user)
+      .put("/users", user)
       .finally(() => toast.dismiss(tid));
     setUsers((state) => state.map((u) => (u.id === user.id ? user : u)));
   };
@@ -352,7 +357,7 @@ const AdminDialog: React.FC<{ open: boolean; onClose: () => any }> = ({ onClose,
         </div>
       </DialogTitle>
       <DialogContent>
-        <div className="flex flex-col max-w-[90vh]">
+        <div className="flex flex-col max-h-[90vh]">
           <div className="flex justify-end">
             <Button startIcon={<FiTrash2 />} onClick={handleDelete}>
               Excluir

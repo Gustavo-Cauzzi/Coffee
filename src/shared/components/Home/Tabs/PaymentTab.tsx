@@ -1,8 +1,12 @@
-import { CircularProgress } from "@mui/material";
+import { Checkbox, CircularProgress } from "@mui/material";
 import { DataGrid, GridPaginationModel } from "@mui/x-data-grid";
+import { isFulfilled, isRejected } from "@reduxjs/toolkit";
 import { Payment } from "@shared/@types/Payment";
-import { findAllPayments } from "@shared/store/modules/paymentSlice";
+import { User } from "@shared/@types/User";
+import { getApi } from "@shared/services/api";
+import { findAllPayments, updatePayment } from "@shared/store/modules/paymentSlice";
 import { AppDispatch, RootState } from "@shared/store/store";
+import { currencyFormatter } from "@shared/utils/formatters";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,6 +15,7 @@ export const PaymentTab: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: 10 });
+  const [loadingRows, setLoadingRows] = useState<Payment["id"][]>([]);
 
   const payments = useSelector<RootState, Payment[]>((state) => state.payments.payments);
 
@@ -24,6 +29,26 @@ export const PaymentTab: React.FC = () => {
     }
   }, []);
 
+  const handlePaymentChange = async (id: Payment["id"], checked: boolean) => {
+    const paymentToEdit = payments.find((payment) => payment.id === id);
+    if (!paymentToEdit) {
+      toast.error("Não foi possível encontrar o pagamento para editar");
+      return;
+    }
+    const toastId = toast.loading("Atualizando dados...");
+    setLoadingRows((state) => [...state, id]);
+    const result = await dispatch(updatePayment({ ...paymentToEdit, paid: checked }));
+
+    if (isRejected(result)) {
+      toast.error("Não foi possível atualizar o registro");
+    } else {
+      toast.success("Registro atualizado com sucessocom sucesso!");
+    }
+
+    setLoadingRows((state) => state.filter((id) => id !== id));
+    toast.dismiss(toastId);
+  };
+
   return (
     <>
       <div className="flex flex-col gap-4">
@@ -35,7 +60,34 @@ export const PaymentTab: React.FC = () => {
           <div className="flex justify-end">
             <DataGrid
               density="compact"
-              columns={[]}
+              columns={[
+                { field: "originUser.id", headerName: "Cobrador", flex: 1, valueGetter: (p) => p.row.originUser.name },
+                {
+                  field: "quantity",
+                  headerName: "Quantidade",
+                  flex: 1,
+                  valueGetter: (p) => currencyFormatter.format(p.value),
+                },
+                {
+                  field: "maxPaymentDate",
+                  headerName: "Data limite",
+                  flex: 1,
+                  valueGetter: (p) => p.value?.toLocaleDateString("pt-BR") ?? "-",
+                },
+                {
+                  field: "paid",
+                  headerName: "Pago",
+                  width: 100,
+                  headerAlign: "center",
+                  align: "center",
+                  renderCell: (p) =>
+                    loadingRows.includes(p.row.id) ? (
+                      <CircularProgress size={15} />
+                    ) : (
+                      <Checkbox checked={p.value} onChange={(_e, checked) => handlePaymentChange(p.row.id, checked)} />
+                    ),
+                },
+              ]}
               rows={payments}
               paginationModel={paginationModel}
               onPaginationModelChange={setPaginationModel}

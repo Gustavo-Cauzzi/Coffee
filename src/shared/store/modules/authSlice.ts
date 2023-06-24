@@ -55,7 +55,6 @@ export const authSlice = createSlice({
             state.isAuthenticated = false;
         });
         builder.addMatcher(isAnyOf(logIn.fulfilled, loadUser.fulfilled), (state, action) => {
-            console.log("action.payload: ", action.payload);
             state.user = action.payload;
             state.isAuthenticated = true;
         });

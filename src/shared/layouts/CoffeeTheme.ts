@@ -75,7 +75,7 @@ export const coffeeTheme = createTheme({
                     // Com collapse
                     "&:has(> .MuiTableRow-root > .MuiTableCell-root[colspan]:only-child)": {
                         ".MuiTableRow-root:not(.MuiTableRow-head)": {
-                            "&:nth-of-type(4n -1)": {
+                            "&:nth-of-type(4n +1)": {
                                 backgroundColor: "rgba(0, 0, 0,0.04)",
                             },
                             // Hover de TableRow configurado aqui dentro para manter prioridade sobre o :nth-of-type acima
@@ -119,12 +119,21 @@ export const coffeeTheme = createTheme({
             styleOverrides: {
                 root: {
                     border: 0,
+                    "& .MuiDataGrid-overlay": {
+                        background: "transparent",
+                    },
                     "& .MuiCheckbox-root": {
                         padding: "3px 9px",
                     },
-                    // '& .MuiDataGrid-columnSeparator': {
-                    //     backgroundColor: `#FC7422`,
-                    // },
+                    "& .MuiDataGrid-row": {
+                        transition: "background-color 0.15s",
+                        "&:nth-of-type(odd)": {
+                            backgroundColor: "rgba(0, 0, 0, 0.06)",
+                            "&:hover": {
+                                backgroundColor: "rgba(0, 0, 0, 0.1)",
+                            },
+                        },
+                    },
 
                     "& .MuiDataGrid-renderingZone, .MuiDataGrid-virtualScrollerContent": {
                         "& .MuiDataGrid-row": {
@@ -144,13 +153,13 @@ export const coffeeTheme = createTheme({
                                 filter: "brightness(0.9)",
                             },
 
-                            "&.Mui-selected": {
-                                backgroundColor: `rgba(12, 6, 63, 0.1)`,
+                            // "&.Mui-selected": {
+                            //     backgroundColor: `rgba(12, 6, 63, 0.1)`,
 
-                                "&:hover": {
-                                    backgroundColor: `rgba(12, 6, 63, 0.12);`,
-                                },
-                            },
+                            //     "&:hover": {
+                            //         backgroundColor: `rgba(12, 6, 63, 0.12);`,
+                            //     },
+                            // },
                         },
                         "& .MuiDataGrid-row:last-of-type": {
                             borderTopRightRadius: "3px",

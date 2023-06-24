@@ -1,0 +1,9 @@
+.rotated-background {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/login-background.png");
+  z-index: -1;
+  transform: scaleX(-1);
+  background-size: cover;
+}

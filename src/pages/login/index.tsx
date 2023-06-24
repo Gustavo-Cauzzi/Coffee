@@ -49,6 +49,8 @@ export default function Login() {
     const result = await dispatch(logIn(data));
     if (logIn.rejected.match(result)) {
       toast.error("Usuário inexistente ou senha incorreta");
+    } else {
+      router.push("/coffee");
     }
     setIsLoading(false);
   };

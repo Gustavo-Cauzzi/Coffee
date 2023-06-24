@@ -17,7 +17,7 @@ import { AppDispatch, RootState } from "@shared/store/store";
 import { currencyFormatter } from "@shared/utils/formatters";
 import { FC, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { FiChevronDown, FiChevronUp, FiPlusSquare } from "react-icons/fi";
+import { FiChevronDown, FiChevronUp, FiPlusSquare, FiRefreshCcw } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { NewChargeFormDialog } from "../NewChargeFormDialog";
 import { findAllCharges } from "@shared/store/modules/chargesSlice";
@@ -35,19 +35,26 @@ export const ChargeTab: FC = () => {
     setIsNewChargeDialogOpen(true);
   };
 
+  const getData = () =>
+    dispatch(findAllCharges())
+      .unwrap()
+      .catch(() => toast.error("Não foi possível buscar as cobranças"));
+
   useEffect(() => {
     if (!isManager) return;
     addActionButton(
       "cobrancas",
-      <Button variant="contained" startIcon={<FiPlusSquare />} onClick={handleOpenNewCharge}>
-        Nova cobrança
-      </Button>
+      <div className="flex gap-2 justify-between w-full">
+        <Button variant="contained" startIcon={<FiPlusSquare />} onClick={handleOpenNewCharge}>
+          Nova cobrança
+        </Button>
+        <IconButton onClick={getData} size="small">
+          <FiRefreshCcw />
+        </IconButton>
+      </div>
     );
 
-    if (!charges.length)
-      dispatch(findAllCharges())
-        .unwrap()
-        .catch(() => toast.error("Não foi possível buscar as cobranças"));
+    if (!charges.length) getData();
   }, []);
 
   return (
@@ -73,9 +80,15 @@ export const ChargeTab: FC = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {charges.map((charge) => (
-                    <Row row={charge} key={charge.id} />
-                  ))}
+                  {charges.length ? (
+                    charges.map((charge) => <Row row={charge} key={charge.id} />)
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={7}>
+                        <div className="flex justify-center my-2">Sem dados</div>
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>

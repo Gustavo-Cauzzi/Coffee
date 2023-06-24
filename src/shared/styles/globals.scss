@@ -26,6 +26,9 @@
 }
 
 .nice-scrollbar {
+  &[data-folder-content]::-webkit-scrollbar-track {
+    margin-top: 20px;
+  }
   &::-webkit-scrollbar {
     width: 6px;
     height: 6px;

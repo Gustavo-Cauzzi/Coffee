@@ -26,7 +26,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const parsedUser = { id: user.ref.id, ...userInfo } as User;
 
             const jwt = sign(parsedUser, SUPER_HIPER_MEGA_SECRET);
-            console.log("jwt: ", jwt);
             res.status(200).json({ token: jwt });
         } catch (e) {
             res.status(401).json({ message: "Usuário não encontrado" });

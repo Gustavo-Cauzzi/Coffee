@@ -7,6 +7,7 @@ import { object, string } from "yup";
 import { getApi } from "@shared/services/api";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";
+import styles from "../../shared/styles/signIn.module.scss";
 
 interface FormValues {
   username: string;
@@ -53,12 +54,11 @@ export default function SignIn() {
   const password = watch("password");
   const confirmPassword = watch("confirmPassword");
 
-  console.log("errors: ", errors);
   const handleSubmitUser = async ({ confirmPassword, ...data }: FormValues) => {
     setIsLoading(true);
     type Response = { message?: string };
     const response = await getApi().post<Response>("/users", data);
-    console.log("response.status: ", response.status);
+
     if (response.status === 270) {
       toast.error(response.data.message ?? "");
       return;
@@ -66,7 +66,7 @@ export default function SignIn() {
       toast.success("Usuário criado");
       router.push("/login");
     }
-    console.log("response.data: ", response.data);
+
     setIsLoading(false);
   };
 
@@ -74,7 +74,7 @@ export default function SignIn() {
 
   return (
     <main className="fixed inset-0 flex">
-      <figure style={{ backgroundImage: "url('/login-background.png')" }} className="absolute inset-0 bg-cover" />
+      <figure className={styles["rotated-background"]} />
 
       <form
         onSubmit={handleSubmit(handleSubmitUser)}
