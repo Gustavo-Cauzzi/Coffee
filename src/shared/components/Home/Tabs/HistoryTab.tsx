@@ -1,27 +1,41 @@
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, IconButton } from "@mui/material";
 import { DataGrid, GridPaginationModel } from "@mui/x-data-grid";
 import { History } from "@shared/@types/History";
+import { useFolderActions } from "@shared/context/FolderActionContext";
 import { findAllHistory } from "@shared/store/modules/historySlice";
 import { AppDispatch, RootState } from "@shared/store/store";
 import { FC, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import { FiRefreshCcw } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 
 export const HistoryTab: FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const { addActionButton } = useFolderActions();
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: 10 });
 
   const histories = useSelector<RootState, History[]>((state) => state.history.history);
 
+  const getData = () => {
+    setIsLoading(true);
+    dispatch(findAllHistory())
+      .unwrap()
+      .catch(() => toast.error("Não foi possível buscar o histórico"))
+      .finally(() => setIsLoading(false));
+  };
+
   useEffect(() => {
-    if (!histories.length) {
-      setIsLoading(true);
-      dispatch(findAllHistory())
-        .unwrap()
-        .catch(() => toast.error("Não foi possível buscar o histórico"))
-        .finally(() => setIsLoading(false));
-    }
+    addActionButton(
+      "histórico",
+      <div className="flex justify-end w-full">
+        <IconButton onClick={getData} size="small">
+          <FiRefreshCcw />
+        </IconButton>
+      </div>
+    );
+
+    if (!histories.length) getData();
   }, []);
 
   return (

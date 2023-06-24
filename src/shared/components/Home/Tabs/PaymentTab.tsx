@@ -1,32 +1,46 @@
-import { Checkbox, CircularProgress } from "@mui/material";
+import { Checkbox, CircularProgress, IconButton } from "@mui/material";
 import { DataGrid, GridPaginationModel } from "@mui/x-data-grid";
 import { isFulfilled, isRejected } from "@reduxjs/toolkit";
 import { Payment } from "@shared/@types/Payment";
 import { User } from "@shared/@types/User";
+import { useFolderActions } from "@shared/context/FolderActionContext";
 import { getApi } from "@shared/services/api";
 import { findAllPayments, updatePayment } from "@shared/store/modules/paymentSlice";
 import { AppDispatch, RootState } from "@shared/store/store";
 import { currencyFormatter } from "@shared/utils/formatters";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { FiRefreshCcw } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 
 export const PaymentTab: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const { addActionButton } = useFolderActions();
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: 10 });
   const [loadingRows, setLoadingRows] = useState<Payment["id"][]>([]);
 
   const payments = useSelector<RootState, Payment[]>((state) => state.payments.payments);
 
+  const getData = () => {
+    setIsLoading(true);
+    dispatch(findAllPayments())
+      .unwrap()
+      .catch(() => toast.error("Não foi possível buscar o histórico"))
+      .finally(() => setIsLoading(false));
+  };
+
   useEffect(() => {
-    if (!payments.length) {
-      setIsLoading(true);
-      dispatch(findAllPayments())
-        .unwrap()
-        .catch(() => toast.error("Não foi possível buscar o histórico"))
-        .finally(() => setIsLoading(false));
-    }
+    addActionButton(
+      "pagamentos",
+      <div className="flex justify-end w-full">
+        <IconButton onClick={getData} size="small">
+          <FiRefreshCcw />
+        </IconButton>
+      </div>
+    );
+
+    if (!payments.length) getData();
   }, []);
 
   const handlePaymentChange = async (id: Payment["id"], checked: boolean) => {
