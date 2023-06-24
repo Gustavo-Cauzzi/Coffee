@@ -23,10 +23,11 @@ import { ReactNode, SyntheticEvent, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { AiOutlineClose } from "react-icons/ai";
 import { BsArrowsAngleContract, BsArrowsAngleExpand } from "react-icons/bs";
-import { FiInfo, FiPower, FiShield, FiTrash2, FiUser } from "react-icons/fi";
+import { FiCoffee, FiInfo, FiPower, FiShield, FiTrash2, FiUser } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
+import Image from "next/image";
 
-const possibleBackgrounds = ["/background1.png", "/background2.png", "/background3.png"];
+const possibleBackgrounds = ["/background1.png" /*, "/background2.png", "/background3.png" */];
 export type HomeTabs = "histórico" | "cobrancas" | "pagamentos";
 
 const BACKGROUND_CHANGE_DELAY = 30 * 1000; // 30 segs
@@ -124,16 +125,22 @@ export default function Home() {
       >
         <UserMenu />
 
-        <div className="rounded-full z-10 bg-black w-[100px] h-[100px] outline-white outline flex items-center justify-center">
-          {/* <Image src="https://pixy.org/src/12/128443.png" alt="" width={100} height={20} /> */}
-          <small>Alguma coisa</small>
+        <div className="flex bg-white flex-col rounded-lg gap-2 items-center p-4">
+          <Image
+            src="https://cdn.pixabay.com/photo/2016/06/24/10/46/drinks-1477040_1280.png"
+            alt=""
+            width={100}
+            height={80}
+          />
+          {/* <Image src="https://freesvg.org/img/coffee-cup.png" alt="" width={100} height={80} /> */}
+
+          <span className="text-coffee-light-600 max-w-sm text-center p-2 transition-[background-color_0.3s] rounded-lg">
+            Último café feito ás 10:23:36 de {new Date().toLocaleDateString("pt-BR")}
+          </span>
+          <Button variant="contained" size="large" onClick={handleNewCoffee} startIcon={<FiCoffee />}>
+            Café novo!!
+          </Button>
         </div>
-        <span className="text-white max-w-[230px] text-center p-2 hover:bg-[#000000aa] transition-[background-color_0.3s] rounded-lg">
-          Último café feito ás 10:23:36 de {new Date().toLocaleDateString("pt-BR")}
-        </span>
-        <Button variant="contained" size="large" onClick={handleNewCoffee}>
-          Café novo!!!
-        </Button>
       </div>
 
       <div
