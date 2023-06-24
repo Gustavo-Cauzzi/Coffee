@@ -16,12 +16,13 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { Charge } from "@shared/@types/Charge";
 import { User } from "@shared/@types/User";
 import { getApi } from "@shared/services/api";
-import { RootState } from "@shared/store/store";
+import { findAllCharges } from "@shared/store/modules/chargesSlice";
+import { AppDispatch, RootState } from "@shared/store/store";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { FiInfo, FiSave, FiX } from "react-icons/fi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { number, object } from "yup";
 
 interface NewChargeFormDialogProps extends DialogProps {}
@@ -41,6 +42,7 @@ const defaultValues = {
 };
 
 export const NewChargeFormDialog = ({ onClose, ...props }: NewChargeFormDialogProps) => {
+  const dispatch: AppDispatch = useDispatch();
   const [users, setUsers] = useState<User[]>([]);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: 10 });
   const [checkboxSelection, setCheckboxSelection] = useState<User["id"][]>([]);
@@ -49,8 +51,9 @@ export const NewChargeFormDialog = ({ onClose, ...props }: NewChargeFormDialogPr
 
   useEffect(() => {
     const getData = async () => {
-      const response = await getApi().get("/users");
-      setUsers(response.data.users);
+      type Response = { users: User[] };
+      const response = await getApi().get<Response>("/users");
+      setUsers(response.data.users.filter((u) => u.id !== user?.id));
     };
 
     getData();
@@ -77,22 +80,30 @@ export const NewChargeFormDialog = ({ onClose, ...props }: NewChargeFormDialogPr
       return;
     }
 
-    console.log("data: ", data);
     const toastId = toast.loading("Salvando cobrança");
-    getApi()
-      .post("/charges", {
-        maxPaymentDate: data.maxPaymentDate,
-        persons: checkboxSelection.map((id) => users.find((u) => u.id === id)),
-        quantity: Number(data.quantity),
-        user: {
-          id: user.id,
-          name: user.name,
-        },
-        date: new Date(),
-      })
-      .then(() => toast.success("Cobrança criada. Pagadores serão notificados!") && handleClose())
-      .catch(() => toast.error("Não foi possível salvar os dados"))
-      .finally(() => toast.dismiss(toastId));
+    try {
+      await getApi()
+        .post("/charges", {
+          maxPaymentDate: data.maxPaymentDate,
+          persons: checkboxSelection.map((id) => users.find((u) => u.id === id)),
+          quantity: Number(data.quantity),
+          user: {
+            id: user.id,
+            name: user.name,
+          },
+          date: new Date(),
+        })
+        .finally(() => toast.dismiss(toastId));
+    } catch (e) {
+      toast.error("Não foi possível salvar os dados");
+      return;
+    }
+
+    toast.success("Cobrança criada. Pagadores serão notificados!");
+    dispatch(findAllCharges())
+      .unwrap()
+      .catch(() => toast.error("Não foi possível buscar as cobranças"));
+    handleClose();
   };
 
   return (

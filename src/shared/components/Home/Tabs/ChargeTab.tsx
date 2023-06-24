@@ -13,33 +13,26 @@ import {
 import { Charge } from "@shared/@types/Charge";
 import { useFolderActions } from "@shared/context/FolderActionContext";
 import { getApi } from "@shared/services/api";
-import { RootState } from "@shared/store/store";
+import { AppDispatch, RootState } from "@shared/store/store";
 import { currencyFormatter } from "@shared/utils/formatters";
 import { FC, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { FiChevronDown, FiChevronUp, FiPlusSquare } from "react-icons/fi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NewChargeFormDialog } from "../NewChargeFormDialog";
+import { findAllCharges } from "@shared/store/modules/chargesSlice";
 
 export const ChargeTab: FC = () => {
+  const dispatch: AppDispatch = useDispatch();
   const { addActionButton } = useFolderActions();
   const [isNewChargeDialogOpen, setIsNewChargeDialogOpen] = useState(false);
-  const [charges, setCharges] = useState<Charge[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
 
+  const charges = useSelector<RootState, Charge[]>((state) => state.charges.charges);
+  const isLoading = useSelector<RootState, boolean>((state) => state.charges.isLoading);
   const isManager = useSelector<RootState, boolean>((state) => state.auth.user?.isManager ?? false);
 
   const handleOpenNewCharge = () => {
     setIsNewChargeDialogOpen(true);
-  };
-
-  const getData = () => {
-    setIsLoading(true);
-    getApi()
-      .get("/charges")
-      .then((response) => setCharges(response.data))
-      .catch(() => toast.error("Não foi possível buscar as cobranças"))
-      .finally(() => setIsLoading(false));
   };
 
   useEffect(() => {
@@ -51,7 +44,10 @@ export const ChargeTab: FC = () => {
       </Button>
     );
 
-    getData();
+    if (!charges.length)
+      dispatch(findAllCharges())
+        .unwrap()
+        .catch(() => toast.error("Não foi possível buscar as cobranças"));
   }, []);
 
   return (
@@ -87,13 +83,7 @@ export const ChargeTab: FC = () => {
         )}
       </div>
 
-      <NewChargeFormDialog
-        open={isNewChargeDialogOpen}
-        onClose={() => {
-          setIsNewChargeDialogOpen(false);
-          getData();
-        }}
-      />
+      <NewChargeFormDialog open={isNewChargeDialogOpen} onClose={() => setIsNewChargeDialogOpen(false)} />
     </>
   );
 };

@@ -30,7 +30,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 debtorUser: person,
                 idCharge: response.ref.id,
                 maxPaymentDate: response.data.maxPaymentDate,
-                originUser: user,
+                originUser: {
+                    id: user.id,
+                    name: user.name,
+                },
                 paid: false,
                 quantity: response.data.quantity,
             }));
