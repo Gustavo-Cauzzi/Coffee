@@ -107,7 +107,7 @@ export const NewChargeFormDialog = ({ onClose, ...props }: NewChargeFormDialogPr
   };
 
   return (
-    <Dialog maxWidth="lg" fullWidth onClose={handleClose} {...props}>
+    <Dialog maxWidth="md" fullWidth onClose={handleClose} {...props}>
       <DialogTitle className="text-coffee-light-600">Nova cobrança</DialogTitle>
       <DialogContent>
         <div className="flex justify-between gap-4 flex-col sm:flex-row">
