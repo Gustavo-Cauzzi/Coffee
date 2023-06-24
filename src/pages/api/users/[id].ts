@@ -5,7 +5,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Collection, Delete, Ref } from "faunadb";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    log("sadnoisanoi");
     if (req.method === "DELETE") {
         const { id } = req.query;
         try {
