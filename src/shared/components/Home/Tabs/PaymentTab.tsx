@@ -56,7 +56,7 @@ export const PaymentTab: React.FC = () => {
     if (isRejected(result)) {
       toast.error("Não foi possível atualizar o registro");
     } else {
-      toast.success("Registro atualizado com sucessocom sucesso!");
+      toast.success("Registro atualizado com sucesso!");
     }
 
     setLoadingRows((state) => state.filter((id) => id !== id));

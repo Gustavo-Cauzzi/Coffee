@@ -21,13 +21,16 @@ import { FiChevronDown, FiChevronUp, FiPlusSquare, FiRefreshCcw } from "react-ic
 import { useDispatch, useSelector } from "react-redux";
 import { NewChargeFormDialog } from "../NewChargeFormDialog";
 import { findAllCharges } from "@shared/store/modules/chargesSlice";
+import { isBefore } from "date-fns";
 
 export const ChargeTab: FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { addActionButton } = useFolderActions();
   const [isNewChargeDialogOpen, setIsNewChargeDialogOpen] = useState(false);
 
-  const charges = useSelector<RootState, Charge[]>((state) => state.charges.charges);
+  const charges = useSelector<RootState, Charge[]>((state) =>
+    [...state.charges.charges].sort((a, b) => (isBefore(a.date, b.date) ? 1 : -1))
+  );
   const isLoading = useSelector<RootState, boolean>((state) => state.charges.isLoading);
   const isManager = useSelector<RootState, boolean>((state) => state.auth.user?.isManager ?? false);
 

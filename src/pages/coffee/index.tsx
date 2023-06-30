@@ -1,6 +1,7 @@
 import {
   Button,
   Checkbox,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -28,6 +29,8 @@ import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
 import Pusher from "pusher-js";
 import Head from "next/head";
+import { findAllHistory } from "@shared/store/modules/historySlice";
+import { format } from "date-fns";
 
 const possibleBackgrounds = ["/background1.png" /*, "/background2.png", "/background3.png" */];
 export type HomeTabs = "histórico" | "cobrancas" | "pagamentos";
@@ -60,6 +63,7 @@ const requestPermission = async () => {
 };
 
 export default function Home() {
+  const dispatch: AppDispatch = useDispatch();
   const { actionButton } = useFolderActions();
   const [backgroundImg, setBackgroundImg] = useState(getBackgroundImageBasedOnTime);
   const [openTab, setOpenTab] = useState<HomeTabs>();
@@ -68,7 +72,11 @@ export default function Home() {
   const user = useSelector<RootState, User | undefined>((state) => state.auth.user);
   const isManager = useSelector<RootState, boolean>((state) => state.auth.user?.isManager ?? false);
 
+  const isHistoryLoading = useSelector<RootState, boolean>((state) => state.history.isLoading);
+  const mostRecentCoffeHistory = useSelector<RootState, History>((state) => state.history.history[0]);
+
   useEffect(() => {
+    dispatch(findAllHistory());
     const interval = setInterval(() => setBackgroundImg(getBackgroundImageBasedOnTime()), BACKGROUND_CHANGE_DELAY);
     requestPermission();
     setupSocket();
@@ -155,7 +163,7 @@ export default function Home() {
         >
           <UserMenu />
 
-          <div className="flex bg-white flex-col rounded-lg gap-2 items-center p-4">
+          <div className="flex bg-white flex-col rounded-lg gap-2 items-center p-4 min-w-[15rem]">
             <Image
               src="https://cdn.pixabay.com/photo/2016/06/24/10/46/drinks-1477040_1280.png"
               alt=""
@@ -164,9 +172,16 @@ export default function Home() {
             />
             {/* <Image src="https://freesvg.org/img/coffee-cup.png" alt="" width={100} height={80} /> */}
 
-            <span className="text-coffee-light-600 max-w-sm text-center p-2 transition-[background-color_0.3s] rounded-lg">
-              Último café feito ás 10:23:36 de {new Date().toLocaleDateString("pt-BR")}
-            </span>
+            {!mostRecentCoffeHistory || isHistoryLoading ? (
+              <div className="my-1">
+                <CircularProgress />
+              </div>
+            ) : (
+              <span className="text-coffee-light-600 max-w-sm text-center p-2 transition-[background-color_0.3s] rounded-lg">
+                Último café feito ás {format(mostRecentCoffeHistory.created_at, "HH:mm:ss 'de' dd/MM/yyyy")}
+              </span>
+            )}
+
             <Button variant="contained" size="large" onClick={handleNewCoffee} startIcon={<FiCoffee />}>
               Café novo!!
             </Button>
