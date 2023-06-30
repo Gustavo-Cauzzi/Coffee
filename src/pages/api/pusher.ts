@@ -20,7 +20,6 @@ export const config = {
 
 export default function handler(req: NextRequest, res: NextApiResponseServerIO) {
     if (!res.socket.server.pusher) {
-        console.log("New pusher server...");
         // adapt Next's net Server to http Server
         const pusher = new Pusher({
             appId: "1627440",

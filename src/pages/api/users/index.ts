@@ -7,7 +7,6 @@ import { Collection, Create, Documents, Get, Index, Lambda, Map, Match, Paginate
 import { User } from "@shared/@types/User";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    console.log("sadnoisanoi");
     if (req.method === "POST") {
         const { name, username, password } = req.body;
 

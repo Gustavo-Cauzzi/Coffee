@@ -51,6 +51,7 @@ export default function Login() {
       toast.error("Usuário inexistente ou senha incorreta");
     } else {
       router.push("/coffee");
+      location.reload();
     }
     setIsLoading(false);
   };

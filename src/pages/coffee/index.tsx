@@ -44,12 +44,6 @@ const setupSocket = async () => {
     cluster: "us2",
   });
 
-  // const socket = io();
-  // await getApi().get("/socket");
-  // socket = pusher.io(location.protocol + "//" + location.host, {
-  //   path: "/api/socketio",
-  // });
-  console.log("socket: ", pusher);
   const channel = pusher.subscribe("coffee");
   channel.bind("newCoffee", (data: { name: string }) => {
     new Notification(`${data.name} passou café agora mesmo!`);
