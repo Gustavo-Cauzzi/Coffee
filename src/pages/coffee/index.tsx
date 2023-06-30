@@ -26,6 +26,8 @@ import { BsArrowsAngleContract, BsArrowsAngleExpand } from "react-icons/bs";
 import { FiCoffee, FiInfo, FiPower, FiShield, FiTrash2, FiUser } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
+import Pusher from "pusher-js";
+import Head from "next/head";
 
 const possibleBackgrounds = ["/background1.png" /*, "/background2.png", "/background3.png" */];
 export type HomeTabs = "histórico" | "cobrancas" | "pagamentos";
@@ -35,6 +37,33 @@ const FOLDER_HEIGHT_MINIFIED = 300;
 
 const getBackgroundImageBasedOnTime = () =>
   possibleBackgrounds[Math.floor((Date.now() / BACKGROUND_CHANGE_DELAY) % possibleBackgrounds.length)];
+
+const setupSocket = async () => {
+  getApi().get("/pusher");
+  const pusher = new Pusher("8a13f1500977643c14d0", {
+    cluster: "us2",
+  });
+
+  // const socket = io();
+  // await getApi().get("/socket");
+  // socket = pusher.io(location.protocol + "//" + location.host, {
+  //   path: "/api/socketio",
+  // });
+  console.log("socket: ", pusher);
+  const channel = pusher.subscribe("coffee");
+  channel.bind("newCoffee", (data: { name: string }) => {
+    new Notification(`${data.name} passou café agora mesmo!`);
+  });
+};
+
+const requestPermission = async () => {
+  const permission = await Notification.requestPermission();
+  const warned = localStorage.getItem("@coffee/warned");
+  if (!warned && permission !== "granted") {
+    toast("É recomendado que uso das notificações para avisar quando há um café novo passado");
+    localStorage.setItem("@coffee/warned", "1");
+  }
+};
 
 export default function Home() {
   const { actionButton } = useFolderActions();
@@ -47,6 +76,8 @@ export default function Home() {
 
   useEffect(() => {
     const interval = setInterval(() => setBackgroundImg(getBackgroundImageBasedOnTime()), BACKGROUND_CHANGE_DELAY);
+    requestPermission();
+    setupSocket();
 
     return () => clearInterval(interval);
   }, []);
@@ -113,89 +144,95 @@ export default function Home() {
   };
 
   return (
-    <main>
-      <div
-        className="flex w-full absolute inset-0 justify-center items-center flex-col gap-2"
-        style={{
-          backgroundImage: `url(${backgroundImg})`,
-          objectFit: "cover",
-          backgroundSize: "cover",
-          transition: "background 3s",
-        }}
-      >
-        <UserMenu />
+    <>
+      <Head>
+        <title>Café</title>
+      </Head>
 
-        <div className="flex bg-white flex-col rounded-lg gap-2 items-center p-4">
-          <Image
-            src="https://cdn.pixabay.com/photo/2016/06/24/10/46/drinks-1477040_1280.png"
-            alt=""
-            width={100}
-            height={80}
-          />
-          {/* <Image src="https://freesvg.org/img/coffee-cup.png" alt="" width={100} height={80} /> */}
+      <main>
+        <div
+          className="flex w-full absolute inset-0 justify-center items-center flex-col gap-2"
+          style={{
+            backgroundImage: `url(${backgroundImg})`,
+            objectFit: "cover",
+            backgroundSize: "cover",
+            transition: "background 3s",
+          }}
+        >
+          <UserMenu />
 
-          <span className="text-coffee-light-600 max-w-sm text-center p-2 transition-[background-color_0.3s] rounded-lg">
-            Último café feito ás 10:23:36 de {new Date().toLocaleDateString("pt-BR")}
-          </span>
-          <Button variant="contained" size="large" onClick={handleNewCoffee} startIcon={<FiCoffee />}>
-            Café novo!!
-          </Button>
+          <div className="flex bg-white flex-col rounded-lg gap-2 items-center p-4">
+            <Image
+              src="https://cdn.pixabay.com/photo/2016/06/24/10/46/drinks-1477040_1280.png"
+              alt=""
+              width={100}
+              height={80}
+            />
+            {/* <Image src="https://freesvg.org/img/coffee-cup.png" alt="" width={100} height={80} /> */}
+
+            <span className="text-coffee-light-600 max-w-sm text-center p-2 transition-[background-color_0.3s] rounded-lg">
+              Último café feito ás 10:23:36 de {new Date().toLocaleDateString("pt-BR")}
+            </span>
+            <Button variant="contained" size="large" onClick={handleNewCoffee} startIcon={<FiCoffee />}>
+              Café novo!!
+            </Button>
+          </div>
         </div>
-      </div>
 
-      <div
-        className="absolute bottom-0 left-0 right-0 z-[50]"
-        onClick={(e) => handleCloseCurrentTab(e)}
-        style={{
-          backgroundColor: openTab ? "#00000055" : "transparent",
-          transition: "background-color 0.2s",
-          pointerEvents: "all",
-          top: openTab ? "0" : "auto",
-        }}
-      >
-        <div className="absolute bottom-0 left-0 right-0 overflow-hidden">
-          <div className="flex justify-center items-end gap-3">
-            <FolderTab selectedTab={openTab} tabName="histórico" onTabClick={handleOpenTab}>
-              Histórico
-            </FolderTab>
-            {isManager && (
-              <FolderTab selectedTab={openTab} tabName="cobrancas" onTabClick={handleOpenTab}>
-                Cobranças
+        <div
+          className="absolute bottom-0 left-0 right-0 z-[50]"
+          onClick={(e) => handleCloseCurrentTab(e)}
+          style={{
+            backgroundColor: openTab ? "#00000055" : "transparent",
+            transition: "background-color 0.2s",
+            pointerEvents: "all",
+            top: openTab ? "0" : "auto",
+          }}
+        >
+          <div className="absolute bottom-0 left-0 right-0 overflow-hidden">
+            <div className="flex justify-center items-end gap-3">
+              <FolderTab selectedTab={openTab} tabName="histórico" onTabClick={handleOpenTab}>
+                Histórico
               </FolderTab>
-            )}
-            <FolderTab selectedTab={openTab} tabName="pagamentos" onTabClick={handleOpenTab}>
-              Pagamentos
-            </FolderTab>
-          </div>
-          <div
-            id="folder-content"
-            className="bg-coffee-light-200 mt-[-1px] z-[100] rounded-t-3xl px-4 nice-scrollbar"
-            data-folder-content
-            style={{
-              marginBottom: openTab ? 0 : -FOLDER_HEIGHT_MINIFIED,
-              height: expandedTab ? window.innerHeight - 50 : FOLDER_HEIGHT_MINIFIED,
-              transition: "margin 0.2s, height 0.2s",
-              overflow: "overlay",
-            }}
-          >
-            <div className="p-5 w-full flex justify-between text-black">
-              {(openTab && actionButton[openTab]) || <div />}
-
-              <div className="flex">
-                <IconButton size="small" onClick={handleExpand}>
-                  {expandedTab ? <BsArrowsAngleContract size={16} /> : <BsArrowsAngleExpand size={16} />}
-                </IconButton>
-                <IconButton size="small" onClick={() => setOpenTab(undefined)}>
-                  <AiOutlineClose size={16} />
-                </IconButton>
-              </div>
+              {isManager && (
+                <FolderTab selectedTab={openTab} tabName="cobrancas" onTabClick={handleOpenTab}>
+                  Cobranças
+                </FolderTab>
+              )}
+              <FolderTab selectedTab={openTab} tabName="pagamentos" onTabClick={handleOpenTab}>
+                Pagamentos
+              </FolderTab>
             </div>
+            <div
+              id="folder-content"
+              className="bg-coffee-light-200 mt-[-1px] z-[100] rounded-t-3xl px-4 nice-scrollbar"
+              data-folder-content
+              style={{
+                marginBottom: openTab ? 0 : -FOLDER_HEIGHT_MINIFIED,
+                height: expandedTab ? window.innerHeight - 50 : FOLDER_HEIGHT_MINIFIED,
+                transition: "margin 0.2s, height 0.2s",
+                overflow: "overlay",
+              }}
+            >
+              <div className="p-5 w-full flex justify-between text-black">
+                {(openTab && actionButton[openTab]) || <div />}
 
-            {(openTab && folderContent[openTab]) ?? <></>}
+                <div className="flex">
+                  <IconButton size="small" onClick={handleExpand}>
+                    {expandedTab ? <BsArrowsAngleContract size={16} /> : <BsArrowsAngleExpand size={16} />}
+                  </IconButton>
+                  <IconButton size="small" onClick={() => setOpenTab(undefined)}>
+                    <AiOutlineClose size={16} />
+                  </IconButton>
+                </div>
+              </div>
+
+              {(openTab && folderContent[openTab]) ?? <></>}
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
 
